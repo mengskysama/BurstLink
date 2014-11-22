@@ -1,12 +1,12 @@
 BurstLink
 ===========
 
-A fake multi connection proxy based on Twisted
+A fake multiple connection proxy based on Twisted
 
 ### NOTE
 
 1. This is a beta version and may have bugs
-2. Currently **NOT** support encrypt transfer (It only do turn by seq)
+2. Currently **NOT** support encrypt transfer 
 
 ## Installation
 
@@ -22,8 +22,13 @@ Note: suggest install [iocp support](http://sourceforge.net/projects/pywin32/fil
 
 #### Linux
     
-    pip install twisted
+    # pip install twisted
 
+### Server
+
+#### Linux
+
+Same as Client
 
 ## Configuration
 
@@ -36,11 +41,10 @@ Server:
     python server.py
 
 Client:
-   
-    `python local.py`
+
+    python local.py
  Or (for windows double click it)
  
-Socks5
 # License
 
 GPLv3

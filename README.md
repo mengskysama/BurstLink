@@ -1,53 +1,45 @@
 BurstLink
 ===========
-Link Start
-------------------
-1.Test Version now
 
-2.NOT encrypt transfer now ( It only do turn by seq
+A fake multi connection proxy based on Twisted
 
-Client
--------
-1.install python 2.7
+### NOTE
 
-for windows https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi
+1. This a beta version and may have bugs
+2. Currently **NOT** support encrypt transfer (It only do turn by seq)
 
-2.install Twisted and zope
+# Installation
 
-for windows https://pypi.python.org/packages/2.7/T/Twisted/Twisted-14.0.2.win32-py2.7.msi
+## Client
 
-for windows https://pypi.python.org/packages/2.7/z/zope.interface/zope.interface-4.1.1.win32-py2.7.exe#md5=8b36e1fcd506ac9fb325ddf1c7238b07
+### Windows
 
-for linux `pip install twisted`
+1. install [python 2.7](https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi)
+2. install [Twisted](https://pypi.python.org/packages/2.7/T/Twisted/Twisted-14.0.2.win32-py2.7.msi) and [zope](https://pypi.python.org/packages/2.7/z/zope.interface/zope.interface-4.1.1.win32-py2.7.exe#md5=8b36e1fcd506ac9fb325ddf1c7238b07)
 
-2.5 suggest install iocp support for windows http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe/download
+Note: suggest install [iocp support](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe/download)
 
-3.clone this project
+### Linux
+    
+    pip install twisted
 
-for windows https://github.com/mengskysama/BurstLink/archive/master.zip
+# Configuration
 
-4.edit config.py
+edit config.py
 
-5.for server side
+# Usage
 
-`python server.py`
+Server:
 
-for local side
+    python server.py
 
-`python local.py` or (for windows double click it)
+Client:
+   
+    `python local.py`
+ Or (for windows double click it)
+ 
+# License
 
-Socks5
-
--------
-
-License
--------
 GPLv3
-
-
-
-
-
-
 
 #敢不敢不把翻转传输给墙了，人在做天在看

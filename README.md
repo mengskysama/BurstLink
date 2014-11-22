@@ -51,13 +51,12 @@ Client:
 
     python local.py
     
-    
+Or (for windows double click it)
+
 If your system use Python3 by default(eg: Arch Linux)
 
-    python2 server.py
+    python2 local.py
     
- Or (for windows double click it)
- 
 # License
 
 GPLv3

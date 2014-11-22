@@ -95,9 +95,6 @@ class ServerFactory(ClientFactory):
         self.session.close_session()
 
     def clientConnectionFailed(self, connector, reason):
-        global conn
-        conn-=1
-        print 'conn' , conn
         print 'Connection Server failed. Reason:'
         self.session.close_session()
 
@@ -218,8 +215,7 @@ class S5ServerFactory(ServerFactory):
         self.dct_session = {}
 
     def buildProtocol(self, addr):
-        print 'bulid conn'
         return S5Server(self.dct_session)
 
-reactor.listenTCP(1081, S5ServerFactory())
+reactor.listenTCP(config.LOCAL_PORT, S5ServerFactory())
 reactor.run()

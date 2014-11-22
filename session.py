@@ -78,10 +78,10 @@ class Session():
             return
         self.closed = 1
         if self.remote_conn is not None:
-            self.remote_conn.transport.loseConnection()#abortConnection
+            self.remote_conn.transport.abortConnection()#abortConnection
         if self.socks_conn is not None:
-            self.socks_conn.transport.loseConnection()
+            self.socks_conn.transport.abortConnection()
         for conn in self.tunnels_conn:
-            conn.transport.loseConnection()
+            conn.transport.abortConnection()
         self.tunnels_conn = []
         del self.dct_session[self.sessionid]

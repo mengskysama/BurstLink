@@ -18,11 +18,18 @@ clone this project
 
 edit config.py
 
-python server.py
+for server side
+
+`python server.py`
+
+for local side
 
 python local.py
+
+Socks5
 
 License
 -------
 GPLv3
 
+#敢不敢不把翻转传输给墙了，人在做天在看

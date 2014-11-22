@@ -24,5 +24,5 @@ python local.py
 
 License
 -------
-MIT
+GPLv3
 

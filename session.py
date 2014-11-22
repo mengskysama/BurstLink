@@ -19,7 +19,7 @@ class Session():
     """Each socks5 tunnel is a sessin"""
     def __init__(self, dct_session, sessionid):
         self.dct_session = dct_session
-        self.stage = 0
+        #self.stage = 0
         self.sessionid = sessionid
         self.tunnels_conn = []
         self.remote_conn = None

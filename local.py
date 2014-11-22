@@ -42,13 +42,12 @@ class Server(Protocol):
         global conn
         conn+=1
         print 'conn' , conn
-        print 'Server Connected success'
+        print 'Server Connected'
         #session id
         self.sendData(struct.pack('>I', self.session.sessionid))
         self.session.add_conn(self)
         #Seq0
         self.session.send_to_tunnel()
-        print 'Server Connected success end'
 
     def dataReceived(self, data):
         self.buf += data
@@ -81,8 +80,8 @@ class ServerFactory(ClientFactory):
     def __init__(self, session):
         self.session = session
 
-    def startedConnecting(self, connector):
-        print 'Started to connect.'
+    #def startedConnecting(self, connector):
+    #    print 'Started to connect.'
 
     def buildProtocol(self, addr):
         return Server(self.session)
@@ -91,11 +90,11 @@ class ServerFactory(ClientFactory):
         global conn
         conn-=1
         print 'conn' , conn
-        print 'Lost Server.  Reason:'
+        print 'Lost server connection.'
         self.session.close_session()
 
     def clientConnectionFailed(self, connector, reason):
-        print 'Connection Server failed. Reason:'
+        print 'Connection server failed.'
         self.session.close_session()
 
 #reactor.connectTCP('127.0.0.1', 2333, RemoteFactory(2))
@@ -115,10 +114,10 @@ class S5Server(Protocol):
         self.session_id = 0
 
     def connectionMade(self):
-        print 'connectionMade'
+        print 'Socks5 connection made'
 
     def connectionLost(self, reason):
-        print 'connectionLost'
+        print 'Socks5 connection lost'
         if self.session_id not in self.dct_session:
             return
         self.dct_session[self.session_id].close_session()

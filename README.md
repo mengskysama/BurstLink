@@ -10,11 +10,13 @@ Client
 -------
 1.install python 2.7
 
-for windows https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
+for windows https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi
 
-2.install Twisted
+2.install Twisted and zope
 
 for windows https://pypi.python.org/packages/2.7/T/Twisted/Twisted-14.0.2.win32-py2.7.msi
+
+for windows https://pypi.python.org/packages/2.7/z/zope.interface/zope.interface-4.1.1.win32-py2.7.exe#md5=8b36e1fcd506ac9fb325ddf1c7238b07
 
 for linux `pip install twisted`
 
@@ -24,7 +26,7 @@ for linux `pip install twisted`
 
 for windows https://github.com/mengskysama/BurstLink/archive/master.zip
 
-4. edit config.py
+4.edit config.py
 
 5.for server side
 
@@ -41,6 +43,9 @@ Socks5
 License
 -------
 GPLv3
+
+
+
 
 
 

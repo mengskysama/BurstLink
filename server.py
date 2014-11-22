@@ -54,18 +54,18 @@ class RemoteFactory(ClientFactory):
         self.session = session
 
     def startedConnecting(self, connector):
-        print 'Started to connect.'
+        print 'connecting remote'
 
     def buildProtocol(self, addr):
         return Remote(self.session)
 
     def clientConnectionLost(self, connector, reason):
-        print 'Lost Remote.  Reason:'
+        print 'lost remote connection'
         print self.session.sessionid
         self.session.close_session()
 
     def clientConnectionFailed(self, connector, reason):
-        print 'Connection Remote failed. Reason:'
+        print 'Connecte remote failed:'
         self.session.close_session()
 
 #reactor.connectTCP('127.0.0.1', 2333, RemoteFactory(2))
@@ -86,35 +86,36 @@ class Server(Protocol):
         #seq data len
         self.data_len = 0
         self.data_seq = 0
-        self.session_id = 0
+        self.session = None
 
     def connectionMade(self):
-        print 'connectionMade'
+        print 'Local connection made'
         global conn
         conn+=1
         print 'conn' , conn
 
     def connectionLost(self, reason):
-        print 'local connectionLost'
+        print 'Local connection lost'
         global conn
         conn-=1
         print 'conn' , conn
-        self.dct_session[self.session_id].close_session()
+        self.session.close_session()
 
     def dataReceived(self, data):
         self.buf += data
         if self.stage == 0:
             if len(self.buf) < 4:
                 return
-            self.session_id = struct.unpack('>I', self.buf[0:4])[0]
+            session_id = struct.unpack('>I', self.buf[0:4])[0]
             self.buf = self.buf[4:]
-            if self.session_id not in self.dct_session:
-                self.dct_session[self.session_id] = Session(self.dct_session, self.session_id)
-            session = self.dct_session[self.session_id]
+            if session_id not in self.dct_session:
+                self.dct_session[session_id] = Session(self.dct_session, session_id)
+            session = self.dct_session[session_id]
             if session.add_conn(self) is False:
                 #out of SESSION_MAX_TUNNEL close this
                 self.abortConnection()
                 return
+            self.session = session
             self.stage = 1
         if self.stage >= 1:
             while True:
@@ -146,17 +147,19 @@ class Server(Protocol):
                             dest_port = struct.unpack('>H', data[17:19])[0]
                         else:
                             print 'wtf'
+                            self.abortConnection()
+                            return
                         #Connect to Remote
                         print 'Connecting to %s:%s' % (dest_addr, dest_port)
-                        reactor.connectTCP(dest_addr, dest_port, RemoteFactory(self.dct_session[self.session_id]))
+                        reactor.connectTCP(dest_addr, dest_port, RemoteFactory(self.session))
                         self.buf = self.buf[self.data_len:]
                         self.data_len = 0
                         self.stage = 2
                     else:
-                        self.dct_session[self.session_id].recv_seqcache.put(self.data_seq, self.buf[:self.data_len])
+                        self.session.recv_seqcache.put(self.data_seq, self.buf[:self.data_len])
                         self.buf = self.buf[self.data_len:]
                         self.data_len = 0
-                        self.dct_session[self.session_id].send_to_remote()
+                        self.session.send_to_remote()
                 else:
                     break
 

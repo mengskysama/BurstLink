@@ -99,14 +99,19 @@ class Server(Protocol):
         global conn
         conn-=1
         print 'conn' , conn
+        if self.session is None:
+            return
         self.session.close_session()
 
     def dataReceived(self, data):
         self.buf += data
+        #print 'self.stage=' + str(self.stage)
         if self.stage == 0:
+            #print 'buf', self.buf
             if len(self.buf) < 4:
                 return
             session_id = struct.unpack('>I', self.buf[0:4])[0]
+            #print 'get sissid',session_id
             self.buf = self.buf[4:]
             if session_id not in self.dct_session:
                 self.dct_session[session_id] = Session(self.dct_session, session_id)
@@ -157,6 +162,7 @@ class Server(Protocol):
                         self.stage = 2
                     else:
                         self.session.recv_seqcache.put(self.data_seq, self.buf[:self.data_len])
+                        #print 'red a seq '+ str(self.data_seq) + ' ' + str(len(self.buf[:self.data_len]))
                         self.buf = self.buf[self.data_len:]
                         self.data_len = 0
                         self.session.send_to_remote()

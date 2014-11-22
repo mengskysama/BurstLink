@@ -46,6 +46,7 @@ class Session():
         if len(self.tunnels_conn) == 0:
             return
         lst = self.send_seqcache.getin()
+        #print 'send_to_tunnel ', lst
         if lst is None:
             return
         for i in lst:
@@ -78,10 +79,11 @@ class Session():
             return
         self.closed = 1
         if self.remote_conn is not None:
-            self.remote_conn.transport.abortConnection()#abortConnection
+            self.remote_conn.transport.loseConnection()#abortConnection
         if self.socks_conn is not None:
-            self.socks_conn.transport.abortConnection()
+            self.socks_conn.transport.loseConnection()
         for conn in self.tunnels_conn:
-            conn.transport.abortConnection()
+            conn.transport.loseConnection()
         self.tunnels_conn = []
-        del self.dct_session[self.sessionid]
+        if self.sessionid in self.dct_session:
+            del self.dct_session[self.sessionid]

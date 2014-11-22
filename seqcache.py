@@ -54,7 +54,7 @@ class SeqCache():
             self.dct_seq[self._next_seq()] = data[:config.SEQ_SIZE][::-1]
             self.total_len += len(self.dct_seq[self._next_seq()])
             data = data[config.SEQ_SIZE:]
-            #print 'putin seq=',self._next_seq()
+            #print 'putin seq= ',self._next_seq(), ' len ', len(self.dct_seq[self._next_seq()])
             self.get_seq = self._next_seq()
 
         if self.total_len > self.max_len:

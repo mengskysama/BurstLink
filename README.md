@@ -5,7 +5,7 @@ A fake multi connection proxy based on Twisted
 
 ### NOTE
 
-1. This a beta version and may have bugs
+1. This is a beta version and may have bugs
 2. Currently **NOT** support encrypt transfer (It only do turn by seq)
 
 ## Installation

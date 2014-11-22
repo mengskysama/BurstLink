@@ -16,6 +16,7 @@ A fake multi connection proxy based on Twisted
 
 1. install [python 2.7](https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi)
 2. install [Twisted](https://pypi.python.org/packages/2.7/T/Twisted/Twisted-14.0.2.win32-py2.7.msi) and [zope](https://pypi.python.org/packages/2.7/z/zope.interface/zope.interface-4.1.1.win32-py2.7.exe#md5=8b36e1fcd506ac9fb325ddf1c7238b07)
+3. Download from [this](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe/download)
 
 Note: suggest install [iocp support](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe/download)
 

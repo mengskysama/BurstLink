@@ -25,7 +25,7 @@ Note: suggest install [iocp support](http://sourceforge.net/projects/pywin32/fil
 
 ## Configuration
 
-edit `config.py`
+Edit `config.py`
 
 ## Usage
 

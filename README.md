@@ -38,6 +38,7 @@ Client:
     `python local.py`
  Or (for windows double click it)
  
+Socks5
 # License
 
 GPLv3

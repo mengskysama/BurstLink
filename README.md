@@ -21,14 +21,26 @@ A fake multiple connection proxy based on Twisted
 Note: suggest install [iocp support](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe/download)
 
 #### Linux
-    
-    # pip install twisted
 
+Same as server
+    
 ### Server
 
-#### Linux
+#### Debian/Ubuntu: 
 
-Same as Client
+    # apt-get install python-pip
+    # pip install twisted
+
+#### CentOS:
+
+    # yum install python-setuptools
+    # easy_install pip
+    # pip install twisted
+    
+#### Arch Linux
+
+    # pacman -S python-pip
+    # pip install twisted
 
 ## Configuration
 
@@ -43,6 +55,12 @@ Server:
 Client:
 
     python local.py
+    
+    
+If your system use Python3 by default(eg: Arch Linux)
+
+    python2 server.py
+    
  Or (for windows double click it)
  
 # License

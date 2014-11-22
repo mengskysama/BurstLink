@@ -37,11 +37,6 @@ Same as server
     # easy_install pip
     # pip install twisted
     
-#### Arch Linux
-
-    # pacman -S python-pip
-    # pip install twisted
-
 ## Configuration
 
 Edit `config.py`

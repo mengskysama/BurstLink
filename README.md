@@ -1,53 +1,64 @@
 BurstLink
 ===========
-Link Start
-------------------
-1.Test Version now
 
-2.NOT encrypt transfer now ( It only do turn by seq
+A fake multiple connection proxy based on Twisted
 
-Client
--------
-1.install python 2.7
+### NOTE
 
-for windows https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi
+1. This is a beta version and may have bugs
+2. Currently **NOT** support encrypt transfer 
 
-2.install Twisted and zope
+## Installation
 
-for windows https://pypi.python.org/packages/2.7/T/Twisted/Twisted-14.0.2.win32-py2.7.msi
+### Client
 
-for windows https://pypi.python.org/packages/2.7/z/zope.interface/zope.interface-4.1.1.win32-py2.7.exe#md5=8b36e1fcd506ac9fb325ddf1c7238b07
+#### Windows
 
-for linux `pip install twisted`
+1. Install [python 2.7](https://www.python.org/ftp/python/2.7.8/python-2.7.8.msi)
+2. Install [Twisted](https://pypi.python.org/packages/2.7/T/Twisted/Twisted-14.0.2.win32-py2.7.msi) and [zope](https://pypi.python.org/packages/2.7/z/zope.interface/zope.interface-4.1.1.win32-py2.7.exe#md5=8b36e1fcd506ac9fb325ddf1c7238b07)
+3. Download from [this](https://github.com/mengskysama/BurstLink/archive/master.zip)
 
-2.5 suggest install iocp support for windows http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe/download
+Note: suggest install [iocp support](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe/download)
 
-3.clone this project
+#### Linux
 
-for windows https://github.com/mengskysama/BurstLink/archive/master.zip
+Same as server
+    
+### Server
 
-4.edit config.py
+#### Debian/Ubuntu: 
 
-5.for server side
+    # apt-get install python-pip
+    # pip install twisted
 
-`python server.py`
+#### CentOS:
 
-for local side
+    # yum install python-setuptools
+    # easy_install pip
+    # pip install twisted
+    
+## Configuration
 
-`python local.py` or (for windows double click it)
+Edit `config.py`
 
-Socks5
+## Usage
 
--------
+Server:
 
-License
--------
+    python server.py
+
+Client:
+
+    python local.py
+    
+Or (for windows double click it)
+
+If your system use Python3 by default(eg: Arch Linux)
+
+    python2 local.py
+    
+# License
+
 GPLv3
-
-
-
-
-
-
 
 #敢不敢不把翻转传输给墙了，人在做天在看

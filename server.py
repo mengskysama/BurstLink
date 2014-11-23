@@ -7,16 +7,23 @@
 
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol, ClientFactory, ServerFactory
-from sys import stdout
+
 import struct
 import socket
 import config
 import platform
-if platform.system() == 'Windows':
+_platform = platform.system().lower()
+if _platform == 'windows':
     from twisted.internet import iocpreactor
     try:
         #http://sourceforge.net/projects/pywin32/
         iocpreactor.install()
+    except:
+        pass
+elif _platform == 'darwin':
+    from twisted.internet import pollreactor
+    try:
+        pollreactor.install()
     except:
         pass
 else:
@@ -27,7 +34,6 @@ else:
         pass
 
 from session import Session
-
 
 class Remote(Protocol):
 

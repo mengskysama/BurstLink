@@ -12,13 +12,19 @@ import struct
 import socket
 import random
 import config
-
 import platform
-if platform.system() == 'Windows':
+_platform = platform.system().lower()
+if _platform == 'windows':
     from twisted.internet import iocpreactor
     try:
         #http://sourceforge.net/projects/pywin32/
         iocpreactor.install()
+    except:
+        pass
+elif _platform == 'darwin':
+    from twisted.internet import pollreactor
+    try:
+        pollreactor.install()
     except:
         pass
 else:
@@ -111,22 +117,22 @@ class S5Server(Protocol):
         self.stage = 0
         self.buf = ''
         #seq data len
-        self.session_id = 0
+        self.session = None
 
     def connectionMade(self):
         print 'Socks5 connection made'
 
     def connectionLost(self, reason):
         print 'Socks5 connection lost'
-        if self.session_id not in self.dct_session:
+        if self.session is None:
             return
-        self.dct_session[self.session_id].close_session()
+        self.session.close_session()
 
     def dataReceived(self, data):
         self.buf += data
         if self.stage == 3:
-            self.dct_session[self.session_id].send_seqcache.putin(self.buf)
-            self.dct_session[self.session_id].send_to_tunnel()
+            self.session.send_seqcache.putin(self.buf)
+            self.session.send_to_tunnel()
             self.buf = ''
             return
         if self.stage == 0:
@@ -193,14 +199,14 @@ class S5Server(Protocol):
             self.sendData('\x05\x00\x00\x01\x00\x00\x00\x00\x00\x00')
             #sock5 head done put to seq0
             #random a session id
-            self.session_id = random.randint(1, 999999999)
-            session = Session(self.dct_session, self.session_id)
-            session.socks_conn = self
-            self.dct_session[self.session_id] = session
+            session_id = random.randint(1, 999999999)
+            self.session = Session(self.dct_session, session_id)
+            self.session.socks_conn = self
+            self.dct_session[session_id] = self.session
             #connect to server
             for i in range(0, config.SESSION_MAX_TUNNEL):
-                reactor.connectTCP(config.SERVER_IP, config.SERVER_PORT, ServerFactory(session))
-            session.send_seqcache.dct_seq[0] = self.buf[:header_length]
+                reactor.connectTCP(config.SERVER_IP, config.SERVER_PORT, ServerFactory(self.session))
+            self.session.send_seqcache.dct_seq[0] = self.buf[:header_length]
             self.buf = self.buf[header_length:]
             self.stage = 3
 

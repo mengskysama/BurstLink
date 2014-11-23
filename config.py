@@ -5,7 +5,7 @@ SERVER_PORT = 2333
 LOCAL_PORT = 1086
 
 #i don't konw how much it need
-SESSION_BUFF_SIZE = 4 * 1024 * 1024
+SESSION_BUFF_SIZE = 5 * 1024 * 1024
 SEQ_SIZE = 1450
 
 

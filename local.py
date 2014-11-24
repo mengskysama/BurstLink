@@ -24,7 +24,7 @@ if _platform == 'windows':
 elif _platform == 'darwin':
     from twisted.internet import selectreactor
     try:
-        pollreactor.install()
+        selectreactor.install()
     except:
         pass
 else:

@@ -71,10 +71,10 @@ class SeqCache():
             data = self.dct_seq[seq]
             lst.insert(0, [seq, data])
             del self.dct_seq[seq]
+            self.total_len -= len(data)
             seq = (seq - 1) % 65535
             if seq not in self.dct_seq:
                 break
-        self.total_len -= len(data)
         return lst
 
 def testin():

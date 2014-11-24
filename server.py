@@ -21,7 +21,7 @@ if _platform == 'windows':
     except:
         pass
 elif _platform == 'darwin':
-    from twisted.internet import pollreactor
+    from twisted.internet import selectreactor
     try:
         pollreactor.install()
     except:
@@ -74,11 +74,6 @@ class RemoteFactory(ClientFactory):
         print 'Connecte remote failed:'
         self.session.close_session()
 
-#reactor.connectTCP('127.0.0.1', 2333, RemoteFactory(2))
-#reactor.connectTCP('127.0.0.1', 2334, RemoteFactory(3))
-#reactor.run()
-
-conn = 0
 
 class Server(Protocol):
 
@@ -96,15 +91,9 @@ class Server(Protocol):
 
     def connectionMade(self):
         print 'Local connection made'
-        global conn
-        conn+=1
-        print 'conn' , conn
 
     def connectionLost(self, reason):
         print 'Local connection lost'
-        global conn
-        conn-=1
-        print 'conn' , conn
         if self.session is None:
             return
         self.session.close_session()

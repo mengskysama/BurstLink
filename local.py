@@ -22,7 +22,7 @@ if _platform == 'windows':
     except:
         pass
 elif _platform == 'darwin':
-    from twisted.internet import pollreactor
+    from twisted.internet import selectreactor
     try:
         pollreactor.install()
     except:
@@ -36,7 +36,7 @@ else:
 
 from session import Session
 
-conn = 0
+
 class Server(Protocol):
 
     def __init__(self, session):
@@ -45,10 +45,6 @@ class Server(Protocol):
         self.data_len = 0
 
     def connectionMade(self):
-        global conn
-        conn+=1
-        print 'conn' , conn
-        print 'Server Connected'
         #session id
         self.sendData(struct.pack('>I', self.session.sessionid))
         self.session.add_conn(self)
@@ -93,19 +89,12 @@ class ServerFactory(ClientFactory):
         return Server(self.session)
 
     def clientConnectionLost(self, connector, reason):
-        global conn
-        conn-=1
-        print 'conn' , conn
         print 'Lost server connection.'
         self.session.close_session()
 
     def clientConnectionFailed(self, connector, reason):
         print 'Connection server failed.'
         self.session.close_session()
-
-#reactor.connectTCP('127.0.0.1', 2333, RemoteFactory(2))
-#reactor.connectTCP('127.0.0.1', 2334, RemoteFactory(3))
-#reactor.run()
 
 
 class S5Server(Protocol):

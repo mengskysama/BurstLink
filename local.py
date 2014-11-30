@@ -49,7 +49,7 @@ class Server(Protocol):
         self.sendData(struct.pack('>I', self.session.sessionid))
         self.session.add_conn(self)
         #Seq0
-        self.session.send_to_tunnel()
+        self.session.send_to_tunnel_t()
 
     def dataReceived(self, data):
         self.buf += data
@@ -121,7 +121,7 @@ class S5Server(Protocol):
         self.buf += data
         if self.stage == 3:
             self.session.send_seqcache.putin(self.buf)
-            self.session.send_to_tunnel()
+            self.session.send_to_tunnel_t()
             self.buf = ''
             return
         if self.stage == 0:

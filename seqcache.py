@@ -60,7 +60,7 @@ class SeqCache():
         if self.total_len > self.max_len:
             raise Exception('cache out of max_len')
 
-    def getin(self):
+    def getin(self, max_seq=-1):
         """for send seq"""
         data = ''
         seq = self.get_seq
@@ -75,6 +75,10 @@ class SeqCache():
             seq = (seq - 1) % 65535
             if seq not in self.dct_seq:
                 break
+            if max_seq != -1:
+                max_seq -= 1
+                if max_seq == 0:
+                    break
         return lst
 
 def testin():

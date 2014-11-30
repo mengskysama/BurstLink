@@ -14,20 +14,17 @@ import config
 logging.basicConfig(level=logging.DEBUG)
 
 
-class Socks5Session(TCPServer):
+class Socks5Tunnel():
 
-    def __init__(self, server, io_loop=None, **kwargs):
+    def __init__(self, server, stream):
         self.server_dct_session = server.dct_session
-        self.stream = None
+        self.stream = stream
         self.session = None
         self.remote_stream = None
-        self.send_to_remote_callback = None
-        self.read_from_remote_called = False
-        TCPServer.__init__(self, io_loop=io_loop, **kwargs)
-
-    def handle_stream(self, stream, address):
-        self.stream = stream
-        logging.debug("Local connected %s:%s" % (address[0], address[1]))
+        self.send_to_tunnel_called = False
+        self.read_from_tunnel_called = False
+        self.data_seq = 0
+        self.data_len = 0
         self.sessionid_read()
 
     def sessionid_read(self):
@@ -35,40 +32,51 @@ class Socks5Session(TCPServer):
 
     def on_sessionid_read(self, data):
         session_id = struct.unpack('>I', data)[0]
+        print 'on_sessionid_read',session_id
         #print 'get sissid',session_id
-        if session_id not in self.dct_session:
-            self.dct_session[session_id] = Session(self.dct_session, session_id)
-        session = self.dct_session[session_id]
-        if session.add_conn(self) is False:
-            #out of SESSION_MAX_TUNNEL close this
-            logging.debug("session out of SESSION_MAX_TUNNEL close")
-            self.stream.close()
-        self.session = session
-        self.seq_head_read()
+        if session_id not in self.server_dct_session:
+            self.server_dct_session[session_id] = Session(self.server_dct_session, session_id)
+            self.session = self.server_dct_session[session_id]
+            self.session.add_conn(self)
+            self.seq_head_read()
+        else:
+            self.session = self.server_dct_session[session_id]
+            if self.session.add_conn(self) is False:
+                #out of SESSION_MAX_TUNNEL close this
+                logging.debug("session out of SESSION_MAX_TUNNEL close")
+                self.stream.close()
+                return
+            self.session.read_from_tunnel(self)
+
+
 
     def seq_head_read(self):
-        self.stream.read_bytes(4, self.on_seq_head_read)
+        self.stream.read_bytes(4, self.on_seq_head_read, partial=False)
 
     def on_seq_head_read(self, data):
-        data_seq = struct.unpack('>H', data[0:2])[0]
-        data_len = struct.unpack('>H', data[2:4])[0]
-        call = self.on_seq_read
-        if data_seq == 0:
-            call = self.on_first_seq_read
-        self.stream.read_bytes(data_len, call)
-
-    def on_seq_read(self, data):
-        pass
+        self.data_seq = struct.unpack('>H', data[0:2])[0]
+        self.data_len = struct.unpack('>H', data[2:4])[0]
+        print self.stream
+        print 'on_seq_head_read', self.data_seq, self.data_len
+        if self.data_seq == 0:
+            self.stream.read_bytes(self.data_len, self.on_first_seq_read, partial=False)
+            self.data_seq = 0
+            self.data_len = 0
+        else:
+            pass
+            #read from tunnel
+            #self.session.read_from_tunnel(self)
 
     def on_first_seq_read(self, data):
-        addrtype = ord(self.data[0])
+        data = data[::-1]
+        addrtype = ord(data[0])
         if addrtype == 1:
-            dest_addr = socket.inet_ntoa(self.data[1:5])
-            dest_port = struct.unpack('>H', self.data[5:7])[0]
+            dest_addr = socket.inet_ntoa(data[1:5])
+            dest_port = struct.unpack('>H', data[5:7])[0]
         elif addrtype == 3:
-            addrlen = ord(self.data[1])
-            dest_addr = self.data[2:2 + addrlen]
-            dest_port = struct.unpack('>H', self.data[2 + addrlen:4 + addrlen])[0]
+            addrlen = ord(data[1])
+            dest_addr = data[2:2 + addrlen]
+            dest_port = struct.unpack('>H', data[2 + addrlen:4 + addrlen])[0]
         elif addrtype == 4:
             dest_addr = socket.inet_ntop(socket.AF_INET6, data[1:17])
             dest_port = struct.unpack('>H', data[17:19])[0]
@@ -76,6 +84,7 @@ class Socks5Session(TCPServer):
             print 'wtf'
             self.stream.close()
             return
+        print 'Connecting',dest_addr,dest_port
         address = (dest_addr, dest_port)
         self.remote_connect(address, socket.AF_INET6 if addrtype == 4 else socket.AF_INET)
 
@@ -87,52 +96,45 @@ class Socks5Session(TCPServer):
 
     def on_remote_connect(self):
         print 'remote connected!'
-        self.session.remote_conn = self
-        self.send_to_remote()
+        self.session.remote_stream = self.remote_stream
+        #read from remote
+        self.session.read_from_remote()
+        #read from tunnel
+        self.session.read_from_tunnel(self)
 
     def on_remote_close(self):
-        print 'remote close'
+        self.session.remote_stream = None
+        print 'remote close!'
         pass
 
-    def send_to_remote(self):
-        self.session.send_to_remote()
+    def send_to_tunnel_callback(self):
+        self.session.send_to_tunnel_callback(self)
 
-    def on_send_to_remote(self):
-        self.send_to_remote()
-
-    def read_from_remote(self):
-        if self.session.read_from_remote_called is True:
-            return
-        if self.session.send_seqcache.total_len + config.SEQ_SIZE > self.session.send_seqcache.max_len:
-            return
-        self.read_from_remote_called = True
-        self.stream.read_bytes(config.SEQ_SIZE, callback=self._on_read_from_remote, partial=True)
-
-    def _on_read_from_remote(self, data):
-        self.session.session.read_from_remote_called = False
-        self.session.send_seqcache.putin(data)
-
-    def send_to_tunnel(self):
-        self.session.send_to_tunnel()
-
-    def on_send_to_tunnel(self):
-        
+    def read_from_tunnel_callback(self, data):
+        self.session.read_from_tunnel_callback(self, data)
 
 
+class Socks5Session(TCPServer):
 
+    def __init__(self, io_loop=None, **kwargs):
+        self.dct_session = {}
+        TCPServer.__init__(self, io_loop=io_loop, **kwargs)
+
+    def handle_stream(self, stream, address):
+        logging.debug("Local connected %s:%s" % (address[0], address[1]))
+        Socks5Tunnel(self, stream)
 
 
 class BurstServer(object):
 
     def __init__(self):
-        self.dct_session = {}
         self.address = '127.0.0.1'
-        self.port = '56789'
+        self.port = config.SERVER_PORT
 
     def server_forever(self):
         try:
             logging.debug("BurstServer Listening on %s:%s" % (self.address, self.port))
-            server = Socks5Session(self)
+            server = Socks5Session()
             server.bind(self.port, self.address)
             server.start()
             tornado.ioloop.IOLoop.instance().start()

@@ -36,19 +36,12 @@ class Socks5Tunnel():
         #print 'get sissid',session_id
         if session_id not in self.server_dct_session:
             self.server_dct_session[session_id] = Session(self.server_dct_session, session_id)
-            self.session = self.server_dct_session[session_id]
-            self.session.add_conn(self)
-            self.seq_head_read()
-        else:
-            self.session = self.server_dct_session[session_id]
-            if self.session.add_conn(self) is False:
-                #out of SESSION_MAX_TUNNEL close this
-                logging.debug("session out of SESSION_MAX_TUNNEL close")
-                self.stream.close()
-                return
-            self.session.read_from_tunnel(self)
-
-
+            #self.session = self.server_dct_session[session_id]
+            #self.session.add_conn(self)
+            #self.seq_head_read()
+        self.session = self.server_dct_session[session_id]
+        self.seq_head_read()
+            #self.session.read_from_tunnel(self)
 
     def seq_head_read(self):
         self.stream.read_bytes(4, self.on_seq_head_read, partial=False)
@@ -56,16 +49,18 @@ class Socks5Tunnel():
     def on_seq_head_read(self, data):
         self.data_seq = struct.unpack('>H', data[0:2])[0]
         self.data_len = struct.unpack('>H', data[2:4])[0]
-        print self.stream
         print 'on_seq_head_read', self.data_seq, self.data_len
         if self.data_seq == 0:
             self.stream.read_bytes(self.data_len, self.on_first_seq_read, partial=False)
-            self.data_seq = 0
             self.data_len = 0
         else:
-            pass
+            if self.session.add_conn(self) is False:
+                #out of SESSION_MAX_TUNNEL close this
+                logging.debug("session out of SESSION_MAX_TUNNEL close")
+                self.stream.close()
+                return
             #read from tunnel
-            #self.session.read_from_tunnel(self)
+            self.session.read_from_tunnel(self)
 
     def on_first_seq_read(self, data):
         data = data[::-1]
@@ -87,6 +82,11 @@ class Socks5Tunnel():
         print 'Connecting',dest_addr,dest_port
         address = (dest_addr, dest_port)
         self.remote_connect(address, socket.AF_INET6 if addrtype == 4 else socket.AF_INET)
+        if self.session.add_conn(self) is False:
+            #out of SESSION_MAX_TUNNEL close this
+            logging.debug("session out of SESSION_MAX_TUNNEL close")
+            self.stream.close()
+            return
 
     def remote_connect(self, address, atype):
         s = socket.socket(atype, socket.SOCK_STREAM)
@@ -97,6 +97,8 @@ class Socks5Tunnel():
     def on_remote_connect(self):
         print 'remote connected!'
         self.session.remote_stream = self.remote_stream
+        #!!
+        self.session.send_to_remote()
         #read from remote
         self.session.read_from_remote()
         #read from tunnel
